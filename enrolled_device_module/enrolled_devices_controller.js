@@ -141,7 +141,7 @@ module.exports = {
     }
     const notificationType = body.message.attributes.notificationType;
     //notificationTypes = ENROLLMENT or USAGE_LOGS
-    console.log(notificationType);
+    // console.log(notificationType);
 
     //Get decoded final data
     const base64stringData = body.message.data; // it is base64 encoded data
