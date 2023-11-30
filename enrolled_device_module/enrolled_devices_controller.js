@@ -125,17 +125,17 @@ module.exports = {
       console.log("i m here 1");
       return next(createError(400, "Invalid request"));
     }
-    // if (aud != process.env.AUD) {
-    //   console.log("i m here 2");
-    //   return next(createError(400, "Invalid request"));
-    // }
-    // if (email != process.env.EMAIL) {
-    //   console.log("i m here 3");
-    //   return next(createError(400, "Invalid request"));
-    // }
+    if (aud != process.env.AUD) {
+      console.log("i m here 2");
+      return next(createError(400, "Invalid request"));
+    }
+    if (email != process.env.EMAIL) {
+      console.log("i m here 3");
+      return next(createError(400, "Invalid request"));
+    }
 
     // const subscription = req.body.subscription;
-    if (body.message.attributes.notificationType == null) {
+    if (body.message.attributes == null) {
       console.log("i m here 3a");
       res.status(200).json({ status: "Success" });
     }
