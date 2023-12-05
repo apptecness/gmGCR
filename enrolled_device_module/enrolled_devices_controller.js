@@ -2,11 +2,11 @@ const createError = require("http-errors");
 const EnrolledDevices = require("./enrolled_devices_model");
 const APIFeatures = require("../utils/apifeatures");
 const jwt = require("jsonwebtoken");
-const allEnrolledDevicesFetcher = require("../busines_logic/allEnrolledDeviceFetcher");
-const allEnrolledDeviceFetcherWithPageToken = require("../busines_logic/allEnrolledDeviceFetcherWithPageToken");
+const allEnrolledDevicesFetchHelper = require("../busines_logic/allEnrolledDeviceFetchHelper");
 const addDeviceLocally = require("../busines_logic/addDeviceLocally");
 const checkIfDeviceExists = require("../busines_logic/checkIfDeviceExists");
-
+//
+const allEnrolledDeviceFetcherAlsoWithPageToken = require("./allEnrolledDeviceFetcherWithPageToken");
 module.exports = {
   fetchAllEnrolledDevices: async (req, res, next) => {
     try {
@@ -19,22 +19,39 @@ module.exports = {
       for (let i = 0; i < enterprises.length; i++) {
         const element = enterprises[i];
         console.log(element);
+        let isCompleted = false;
+        let nextPageToken;
+        while (isCompleted == false) {
+          let response;
+          if (nextPageToken == undefined) {
+            response = await allEnrolledDeviceFetcherAlsoWithPageToken({
+              enterpriseId: element,
+              gToken: gToken,
+            });
+          } else {
+            response = await allEnrolledDeviceFetcherAlsoWithPageToken({
+              enterpriseId: element,
+              gToken: gToken,
+              nextPageToken: nextPageToken,
+            });
+          }
 
-        const response = await allEnrolledDevicesFetcher({
-          enterpriseId: element,
-          gToken: gToken,
-        });
-        const devices = response.body.devices;
-        console.log(devices.length);
-        for (let i = 0; i < devices.length; i++) {
-          const element = devices[i];
-          await checkIfDeviceExists(element);
-        }
+          const devices = response.body.devices;
+          console.log(devices.length);
+          for (let i = 0; i < devices.length; i++) {
+            const element = devices[i];
+            await checkIfDeviceExists(element);
+          }
 
-        // console.log(response.body.devices);
-        console.log(response.body.nextPageToken);
-        if (response.body.nextPageToken != undefined) {
-          console.log("i m hhhheeeee");
+          // console.log(response.body.devices);
+          console.log(response.body.nextPageToken);
+          if (response.body.nextPageToken != undefined) {
+            console.log("not Completed");
+            nextPageToken = response.body.nextPageToken;
+          } else {
+            console.log("Completed");
+            isCompleted = true;
+          }
         }
       }
 

@@ -1,12 +1,16 @@
 const unirest = require("unirest");
 
-const allEnrolledDeviceFetcherWithPageToken = async (options) => {
+const allEnrolledDeviceFetcherAlsoWithPageToken = async (options) => {
   console.log(" all device fetcher with page Token");
   // console.log(options);
   const enterpriseId = options.enterpriseId;
   const gToken = options.gToken;
-  const pageToken = options.pageToken;
-  const req = unirest("GET", `https://androidmanagement.googleapis.com/v1/enterprises/${enterpriseId}/devices?pageSize=500&nextPageToken=${pageToken}`);
+  const nextPageToken = options.nextPageToken;
+  if (nextPageToken != undefined) {
+    const req = unirest("GET", `https://androidmanagement.googleapis.com/v1/enterprises/${enterpriseId}/devices?pageSize=500&nextPageToken=${nextPageToken}`);
+  } else {
+    const req = unirest("GET", `https://androidmanagement.googleapis.com/v1/enterprises/${enterpriseId}/devices?pageSize=${process.env.NOOFDEVICES}`);
+  }
 
   req.headers({
     "Content-Type": "application/json",
@@ -23,4 +27,4 @@ const allEnrolledDeviceFetcherWithPageToken = async (options) => {
   return req;
 };
 
-module.exports = allEnrolledDeviceFetcherWithPageToken;
+module.exports = allEnrolledDeviceFetcherAlsoWithPageToken;
