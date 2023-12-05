@@ -33,7 +33,7 @@ module.exports = {
 
         // console.log(response.body.devices);
         console.log(response.body.nextPageToken);
-        if (response.body.nextPageToken == undefined) {
+        if (response.body.nextPageToken != undefined) {
           console.log("i m hhhheeeee");
         }
       }

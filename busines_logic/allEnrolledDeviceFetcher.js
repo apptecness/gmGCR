@@ -5,6 +5,7 @@ const allEnrolledDevicesFetcher = async (options) => {
   // console.log(options);
   const enterpriseId = options.enterpriseId;
   const gToken = options.gToken;
+  console.log(`https://androidmanagement.googleapis.com/v1/enterprises/${enterpriseId}/devices?pageSize=${process.env.NOOFDEVICES}`);
   const req = unirest("GET", `https://androidmanagement.googleapis.com/v1/enterprises/${enterpriseId}/devices?pageSize=${process.env.NOOFDEVICES}`);
 
   req.headers({
