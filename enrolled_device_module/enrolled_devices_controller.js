@@ -2,11 +2,10 @@ const createError = require("http-errors");
 const EnrolledDevices = require("./enrolled_devices_model");
 const APIFeatures = require("../utils/apifeatures");
 const jwt = require("jsonwebtoken");
-const allEnrolledDevicesFetchHelper = require("../busines_logic/allEnrolledDeviceFetchHelper");
 const addDeviceLocally = require("../busines_logic/addDeviceLocally");
 const checkIfDeviceExists = require("../busines_logic/checkIfDeviceExists");
 //
-const allEnrolledDeviceFetcherAlsoWithPageToken = require("./allEnrolledDeviceFetcherWithPageToken");
+const allEnrolledDeviceFetcherAlsoWithPageToken = require("../busines_logic/allEnrolledDeviceFetcherWithPageToken");
 module.exports = {
   fetchAllEnrolledDevices: async (req, res, next) => {
     try {
