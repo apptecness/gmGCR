@@ -9,6 +9,7 @@ const checkIfDeviceExists = async (options) => {
   var isDeviceExists = await EnrolledDevices.find({ name: options.name });
   // console.log(isDeviceExists);
   if (isDeviceExists.length == 0) {
+    console.log("i m not saved");
     const dataMap = {
       name: options.name,
       managementMode: options.managementMode,

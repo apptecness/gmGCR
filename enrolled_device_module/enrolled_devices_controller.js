@@ -25,6 +25,7 @@ module.exports = {
           gToken: gToken,
         });
         const devices = response.body.devices;
+        console.log(devices.length);
         for (let i = 0; i < devices.length; i++) {
           const element = devices[i];
           await checkIfDeviceExists(element);
