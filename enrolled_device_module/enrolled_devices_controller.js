@@ -56,7 +56,7 @@ module.exports = {
 
       res.status(200).json({ status: "success" });
     } catch (error) {
-      // console.log(error.message);
+      console.log(error.message);
       return next(createError(400, "Internal Server Error"));
     }
   },

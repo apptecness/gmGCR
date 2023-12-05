@@ -6,10 +6,11 @@ const allEnrolledDeviceFetcherAlsoWithPageToken = async (options) => {
   const enterpriseId = options.enterpriseId;
   const gToken = options.gToken;
   const nextPageToken = options.nextPageToken;
+  let req;
   if (nextPageToken != undefined) {
-    const req = unirest("GET", `https://androidmanagement.googleapis.com/v1/enterprises/${enterpriseId}/devices?pageSize=500&nextPageToken=${nextPageToken}`);
+    req = unirest("GET", `https://androidmanagement.googleapis.com/v1/enterprises/${enterpriseId}/devices?pageSize=500&nextPageToken=${nextPageToken}`);
   } else {
-    const req = unirest("GET", `https://androidmanagement.googleapis.com/v1/enterprises/${enterpriseId}/devices?pageSize=${process.env.NOOFDEVICES}`);
+    req = unirest("GET", `https://androidmanagement.googleapis.com/v1/enterprises/${enterpriseId}/devices?pageSize=${process.env.NOOFDEVICES}`);
   }
 
   req.headers({
