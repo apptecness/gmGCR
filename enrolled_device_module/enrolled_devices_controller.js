@@ -156,86 +156,87 @@ module.exports = {
       console.log("i m here 3a");
       res.status(200).json({ status: "Success" });
     }
-    let notificationType;
 
     if (body.message.attributes != null) {
+      let notificationType;
       notificationType = body.message.attributes.notificationType;
+
+      const base64stringData = body.message.data; // it is base64 encoded data
+      // const base64stringData = "";
+      let bufferObj = Buffer.from(base64stringData, "base64");
+      let str = bufferObj.toString("utf8");
+      const finalData = JSON.parse(str);
+      // console.log(finalData);
+      try {
+        if (notificationType == "ENROLLMENT") {
+          const dataMap = {
+            name: finalData.name,
+            managementMode: finalData.managementMode,
+            enrollmentTime: finalData.enrollmentTime,
+            state: finalData.state,
+            brand: finalData.hardwareInfo.brand,
+            model: finalData.hardwareInfo.model,
+            serialNumber: finalData.hardwareInfo.serialNumber,
+            policyName: finalData.policyName,
+            userName: finalData.userName,
+            enrollmentTokenName: finalData.enrollmentTokenName,
+          };
+          console.log(dataMap);
+          const enrolledDevice = EnrolledDevices(dataMap);
+          await enrolledDevice.save();
+          res.status(200).json({ status: "Success" });
+        }
+        //
+        //
+        if (notificationType == "USAGE_LOGS") {
+          console.log(finalData);
+          console.log(finalData["usageLogEvents"][0]["eventType"]);
+          if (finalData["usageLogEvents"][0]["eventType"] == "ENROLLMENT_COMPLETE") {
+            // console.log("emrollment complete");
+            const deviceName = finalData["device"];
+            const rsrs = await EnrolledDevices.find({ name: deviceName });
+            const enrlDevice = rsrs[0];
+            const enrlDeviceId = enrlDevice.id;
+            // console.log(rsrs);
+            const dataMap = {
+              name: enrlDevice.name,
+              managementMode: enrlDevice.managementMode,
+              enrollmentTime: enrlDevice.enrollmentTime,
+              state: enrlDevice.state,
+              brand: enrlDevice.brand,
+              model: enrlDevice.model,
+              serialNumber: enrlDevice.serialNumber,
+              policyName: enrlDevice.policyName,
+              userName: enrlDevice.userName,
+              enrollmentTokenName: enrlDevice.enrollmentTokenName,
+            };
+            console.log(dataMap);
+            var response = await addDeviceLocally({ dataMap });
+            console.log(response.status);
+            if (response.status == 200) {
+              await EnrolledDevices.findByIdAndUpdate(enrlDeviceId, { deviceAddedLocally: true });
+              res.status(200).json({ status: "Success" });
+            } else {
+              res.status(200).json({ status: "Success" });
+            }
+          } else if (finalData["usageLogEvents"][0]["eventType"] == "STOP_LOST_MODE_USER_ATTEMPT") {
+            console.log(finalData);
+            console.log(finalData["usageLogEvents"][0]["stopLostModeUserAttemptEvent"]);
+            if (finalData["usageLogEvents"][0]["stopLostModeUserAttemptEvent"]["status"] == "ATTEMPT_SUCCEEDED") {
+              res.status(200).json({ status: "Success" });
+            }
+          } else {
+            res.status(200).json({ status: "Success" });
+          }
+        }
+      } catch (error) {
+        console.log(error.message);
+        return next(createError(400, "Internal Server Error"));
+      }
     }
     //notificationTypes = ENROLLMENT or USAGE_LOGS
     // console.log(notificationType);
 
     //Get decoded final data
-    const base64stringData = body.message.data; // it is base64 encoded data
-    // const base64stringData = "";
-    let bufferObj = Buffer.from(base64stringData, "base64");
-    let str = bufferObj.toString("utf8");
-    const finalData = JSON.parse(str);
-    // console.log(finalData);
-    try {
-      if (notificationType == "ENROLLMENT") {
-        const dataMap = {
-          name: finalData.name,
-          managementMode: finalData.managementMode,
-          enrollmentTime: finalData.enrollmentTime,
-          state: finalData.state,
-          brand: finalData.hardwareInfo.brand,
-          model: finalData.hardwareInfo.model,
-          serialNumber: finalData.hardwareInfo.serialNumber,
-          policyName: finalData.policyName,
-          userName: finalData.userName,
-          enrollmentTokenName: finalData.enrollmentTokenName,
-        };
-        console.log(dataMap);
-        const enrolledDevice = EnrolledDevices(dataMap);
-        await enrolledDevice.save();
-        res.status(200).json({ status: "Success" });
-      }
-      //
-      //
-      if (notificationType == "USAGE_LOGS") {
-        console.log(finalData);
-        console.log(finalData["usageLogEvents"][0]["eventType"]);
-        if (finalData["usageLogEvents"][0]["eventType"] == "ENROLLMENT_COMPLETE") {
-          // console.log("emrollment complete");
-          const deviceName = finalData["device"];
-          const rsrs = await EnrolledDevices.find({ name: deviceName });
-          const enrlDevice = rsrs[0];
-          const enrlDeviceId = enrlDevice.id;
-          // console.log(rsrs);
-          const dataMap = {
-            name: enrlDevice.name,
-            managementMode: enrlDevice.managementMode,
-            enrollmentTime: enrlDevice.enrollmentTime,
-            state: enrlDevice.state,
-            brand: enrlDevice.brand,
-            model: enrlDevice.model,
-            serialNumber: enrlDevice.serialNumber,
-            policyName: enrlDevice.policyName,
-            userName: enrlDevice.userName,
-            enrollmentTokenName: enrlDevice.enrollmentTokenName,
-          };
-          console.log(dataMap);
-          var response = await addDeviceLocally({ dataMap });
-          console.log(response.status);
-          if (response.status == 200) {
-            await EnrolledDevices.findByIdAndUpdate(enrlDeviceId, { deviceAddedLocally: true });
-            res.status(200).json({ status: "Success" });
-          } else {
-            res.status(200).json({ status: "Success" });
-          }
-        } else if (finalData["usageLogEvents"][0]["eventType"] == "STOP_LOST_MODE_USER_ATTEMPT") {
-          console.log(finalData);
-          console.log(finalData["usageLogEvents"][0]["stopLostModeUserAttemptEvent"]);
-          if (finalData["usageLogEvents"][0]["stopLostModeUserAttemptEvent"]["status"] == "ATTEMPT_SUCCEEDED") {
-            res.status(200).json({ status: "Success" });
-          }
-        } else {
-          res.status(200).json({ status: "Success" });
-        }
-      }
-    } catch (error) {
-      console.log(error.message);
-      return next(createError(400, "Internal Server Error"));
-    }
   },
 };
