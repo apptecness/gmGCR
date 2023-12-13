@@ -43,7 +43,7 @@ module.exports = {
           }
 
           // console.log(response.body.devices);
-          console.log(response.body.nextPageToken);
+          // console.log(response.body.nextPageToken);
           if (response.body.nextPageToken != undefined) {
             console.log("not Completed");
             nextPageToken = response.body.nextPageToken;
@@ -156,7 +156,11 @@ module.exports = {
       console.log("i m here 3a");
       res.status(200).json({ status: "Success" });
     }
-    const notificationType = body.message.attributes.notificationType;
+    let notificationType;
+
+    if (body.message.attributes != null) {
+      notificationType = body.message.attributes.notificationType;
+    }
     //notificationTypes = ENROLLMENT or USAGE_LOGS
     // console.log(notificationType);
 
