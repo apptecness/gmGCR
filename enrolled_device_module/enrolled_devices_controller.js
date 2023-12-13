@@ -128,14 +128,14 @@ module.exports = {
     if (!token) {
       return next(createError(400, "Invalid request"));
     }
-    console.log(token);
+    // console.log(token);
     const decoded = jwt.decode(token);
-    console.log(decoded);
+    // console.log(decoded);
     const aud = decoded.aud;
     const email = decoded.email;
     const emailVerified = decoded.email_verified;
-    console.log(aud);
-    console.log(email);
+    // console.log(aud);
+    // console.log(email);
     // console.log(emailVerified);
     // res.status(200).json({ status: "Success" });
     if (emailVerified != true) {
